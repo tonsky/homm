@@ -1,0 +1,10 @@
+{:deps
+ {org.clojure/clojure         {:mvn/version "1.11.1"}
+  io.github.humbleui/humbleui {:git/sha "c11daaa8dbad91ca0cd47bb1000ff44f4784fc37"}}
+ :aliases
+ {:dev
+  {:extra-paths ["dev"]
+   :extra-deps  {nrepl/nrepl {:mvn/version "0.9.0"}
+                 com.clojure-goes-fast/clj-async-profiler {:mvn/version "1.0.0-alpha1"}}
+   :jvm-opts    ["-Djdk.attach.allowAttachSelf" "-XX:+UnlockDiagnosticVMOptions" "-XX:+DebugNonSafepoints"]
+   :main-opts   ["-m" "nrepl.cmdline" "--interactive"]}}}
