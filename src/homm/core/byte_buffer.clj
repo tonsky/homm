@@ -89,16 +89,17 @@
    (-> (.getShort buf pos) (+ 65536) (mod 65536))))
 
 (defn get-int
-  ([^ByteBuffer buf]
-   (.getInt buf))
-  ([^ByteBuffer buf ^long pos]
-   (.getInt buf pos)))
+  (^long [^ByteBuffer buf]
+    (.getInt buf))
+  (^long [^ByteBuffer buf ^long pos]
+    (.getInt buf pos)))
 
 (defn ^String get-string
-  ([^ByteBuffer buf size] (get-string buf (.position buf) size))
+  ([^ByteBuffer buf size]
+   (get-string buf (.position buf) size))
   ([^ByteBuffer buf idx size]
    (let [arr (byte-array size)
          _   (.get buf idx arr)
          len (some #(when (= (byte 0) (aget arr %)) %) (range size))]
-     (.position buf (int (+ size (.position buf))))
+     (advance buf size)
      (String. arr 0 (int len)))))
