@@ -7,7 +7,7 @@
 
 (set! *warn-on-reflection* true)
 
-(defn from-bgra [^ByteBuffer buf ^long width ^long height]
+(defn from-bgra ^Image [^ByteBuffer buf ^long width ^long height]
   (Image/makeRaster (ImageInfo/makeS32 width height ColorAlphaType/PREMUL) ^bytes (bb/array buf) (* width 4)))
 
 (defn ^ByteBuffer to-png [^Image image]

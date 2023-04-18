@@ -292,7 +292,7 @@
         offset (int offset)
         size   (int size)
         csize  (int csize)]
-    (println "    offset:" offset "size:" size "csize:" csize)
+    #_(println "    offset:" offset "size:" size "csize:" csize)
     (if (> csize 0)
       (let [res      ^ByteBuffer (bb/allocate size)
             inflater (Inflater.)]

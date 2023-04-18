@@ -16,12 +16,15 @@
   (doto (ByteBuffer/wrap bytes)
     (.order ByteOrder/LITTLE_ENDIAN)))
 
+(defn mmap ^MappedByteBuffer [path]
+  (with-open [fc (FileChannel/open (core/path path) (make-array OpenOption 0))]
+    (doto (.map fc FileChannel$MapMode/READ_ONLY 0 (.size fc))
+      (.order ByteOrder/LITTLE_ENDIAN)
+      (.load))))
+
 (defmacro with-mapped [[buf path] & body]
-  `(with-open [fc# (FileChannel/open (core/path ~path) (make-array OpenOption 0))]
-     (let [~buf ^MappedByteBuffer (doto
-                                    (.map fc# FileChannel$MapMode/READ_ONLY 0 (.size fc#))
-                                    (.order ByteOrder/LITTLE_ENDIAN))]
-       ~@body)))
+  `(let [~buf (mmap ~path)]
+     ~@body))
 
 (defn write [^ByteBuffer buf path]
   (with-open [fc (FileChannel/open (core/path path)
