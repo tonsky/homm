@@ -5,6 +5,7 @@
     [homm.core :as core]
     [homm.core.byte-buffer :as bb]
     [homm.extract :as extract]
+    [homm.extract.def :as extract.def]
     [homm.viewer.state :as state]
     [io.github.humbleui.app :as app]
     [io.github.humbleui.debug :as debug]
@@ -67,6 +68,25 @@
 
 (defmethod show-file "pcx" [lod-buf file]
   (let [^Image image (extract/read-pcx (extract/extract-file lod-buf file))
+        width        (.getWidth image)
+        height       (.getHeight image)
+        aspect       (/ (.getWidth image) (.getHeight image))
+        comp         (ui.image/map->AnImage {:image image})]
+    (ui/with-bounds ::bounds
+      (ui/dynamic ctx [bounds (::bounds ctx)]
+        (let [aspect' (/ (:width bounds) (:height bounds))
+              w'      (min (* 2 width) (:width bounds))
+              h'      (/ w' aspect)
+              h''     (min (* 2 height) (:height bounds))
+              w''     (* h'' aspect)]
+          (ui/center
+            (ui/width (min w' w'')
+              (ui/height (min h' h'')
+                comp))))))))
+
+(defmethod show-file "def" [lod-buf file]
+  (let [info         (extract.def/extract-info (extract/extract-file lod-buf file))
+        ^Image image (:image info)
         width        (.getWidth image)
         height       (.getHeight image)
         aspect       (/ (.getWidth image) (.getHeight image))
@@ -182,7 +202,9 @@
             (vlist (lods) :lod {:label-fn #(.getFileName ^Path %)
                                 :on-select (fn [lod]
                                              (let [lod-buf (bb/mmap (str lod))
-                                                   files   (extract/files lod-buf)]
+                                                   files   (->> (extract/files lod-buf)
+                                                             (remove #(str/ends-with? (:name %) ".msk"))
+                                                             vec)]
                                                (swap! state/*state assoc
                                                  :lod-buf lod-buf
                                                  :files   files
