@@ -19,8 +19,7 @@
 (defn mmap ^MappedByteBuffer [path]
   (with-open [fc (FileChannel/open (core/path path) (make-array OpenOption 0))]
     (doto (.map fc FileChannel$MapMode/READ_ONLY 0 (.size fc))
-      (.order ByteOrder/LITTLE_ENDIAN)
-      (.load))))
+      (.order ByteOrder/LITTLE_ENDIAN))))
 
 (defmacro with-mapped [[buf path] & body]
   `(let [~buf (mmap ~path)]
@@ -37,7 +36,7 @@
 (defn array [^ByteBuffer buf]
   (if (.hasArray buf)
     (.array buf)
-    (let [_     (.rewind buf)
+    (let [_ (.rewind buf)
           bytes ^bytes (make-array Byte/TYPE (.remaining buf))]
       (.get buf bytes)
       bytes)))
@@ -50,6 +49,17 @@
 
 (defn ^ByteBuffer advance [^ByteBuffer buf ^long offset]
   (position buf (+ (position buf) offset)))
+
+(defmacro with-position [buf & body]
+  `(let [^ByteBuffer buf# ~buf
+         pos# (position buf#)
+         res# (do ~@body)]
+     (position buf# pos#)
+     res#))
+
+(defn slice ^ByteBuffer [^ByteBuffer buf idx len]
+  (doto (.slice buf (int idx) (int len))
+    (.order ByteOrder/LITTLE_ENDIAN)))
 
 (defn byte->long [^long n]
   (assert (<= -128 n 127) (str "Expected -128..127, got: " n))
@@ -96,6 +106,12 @@
     (.getInt buf))
   (^long [^ByteBuffer buf ^long pos]
     (.getInt buf pos)))
+
+(defn get-ints [^ByteBuffer buf ^long cnt]
+  (let [res (java.util.ArrayList. (int cnt))]
+    (dotimes [i cnt]
+      (.add res (.getInt buf)))
+    res))
 
 (defn ^String get-string
   ([^ByteBuffer buf size]

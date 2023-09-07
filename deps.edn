@@ -1,9 +1,9 @@
 {:deps
  {org.clojure/clojure         {:mvn/version "1.11.1"}
-  io.github.humbleui/humbleui {:git/sha "4f4ac06f92fa7746652e690216c5c0330f88b4fe"}}
+  io.github.humbleui/humbleui {:git/sha "472bb1e15275af7d32c4057c799f304ef9b6a6fe"}}
  :aliases
  {:dev
   {:extra-paths ["dev"]
-   :extra-deps  {org.clojure/tools.namespace {:mvn/version "1.3.0"}
+   :extra-deps  {org.clojure/tools.namespace              {:mvn/version "1.4.4"}
                  com.clojure-goes-fast/clj-async-profiler {:mvn/version "1.0.3"}}
    :jvm-opts    ["-ea" "-Djdk.attach.allowAttachSelf" "-XX:+UnlockDiagnosticVMOptions" "-XX:+DebugNonSafepoints"]}}}

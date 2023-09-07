@@ -217,26 +217,29 @@
 
 (reset! state/*app app)
 
-(defn -main [& args]
+(defn start! []
   (ui/start-app!
     (let [screen (app/primary-screen)]
       (reset! state/*window 
         (ui/window
           {:title    "HoMM III Resource Viewer"
-           :mac-icon "dev/homm/viewer/icon.icns"
+           :mac-icon "src/homm/viewer/icon.icns"
            :screen   (:id screen)
            :width    600
            :height   600
            :x        :center
            :y        :center}
           state/*app))))
-  (reset! protocols/*debug? true)
+  (reset! protocols/*debug? false))
+
+(defn -main [& args]
+  (start!)
   (let [{port "--port"
          :or {port "5555"}} (apply array-map args)
         port (parse-long port)]
-    (println "Started Server Socket REPL on port" port)
     (server/start-server
       {:name          "repl"
        :port          port
        :accept        'clojure.core.server/repl
-       :server-daemon false})))
+       :server-daemon false})
+    (println "Started Server Socket REPL on port" port)))
